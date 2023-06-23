@@ -107,8 +107,8 @@ convert_batch <- function(x){
               mutate(across(all_of(names(as.data.frame(computeFeatures.shape(final)))), ~ .x /83)) %>%
               mutate(pixels.size = (s.radius.max*2)*83) %>% 
               mutate(size..mm. = s.radius.max*2) %>% 
-              filter(size..mm. < 7.5) %>% 
-              filter(size..mm. > 0.9) %>% 
+              filter(size..mm. < 8) %>% 
+              filter(size..mm. > 0.5) %>% 
               mutate(Sample = paste0(x)), 
             paste0("../Datasets/Hydrobia_full/Outputs/Features/Hydrobia_SF71_amb_1_C3_superpix_segment_features/", x, ".csv"))
   
