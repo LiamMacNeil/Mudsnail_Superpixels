@@ -1,5 +1,7 @@
 # Mudsnail image segmentation with superpixels
 
+[![DOI](https://zenodo.org/badge/642758934.svg)](https://zenodo.org/doi/10.5281/zenodo.10522503)
+
 <p float="left">
   <img src="https://github.com/LiamMacNeil/Mudsnail_Superpixels/blob/main/Ex/Github_ex.png" width="900" />
 </p>
