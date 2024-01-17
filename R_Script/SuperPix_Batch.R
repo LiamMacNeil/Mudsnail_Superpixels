@@ -1,12 +1,3 @@
-################# ################# #################
-#
-# CAVEAT EMPTOR.
-#
-# Image segmentation developed by Liam MacNeil and fit-for-purpose of a specific research project. 
-# All methods build on existing open-source packages cited below. 
-#
-################# ################# #################
-
 library(SuperpixelImageSegmentation)
 library(autothresholdr)
 library(tidyverse)
@@ -32,10 +23,10 @@ dir.create("../Datasets/Hydrobia_full/Outputs/Segments/Hydrobia_SF71_amb_1_C3_su
 dir.create("../Datasets/Hydrobia_full/Outputs/Features/Hydrobia_SF71_amb_1_C3_superpix_segment_features")
 
 ### Full function
-convert_batch <- function(x){
+Segmentation <- function(x){
   
   ### Read in images by x
-  mask <- readImage(paste0("../Datasets/Hydrobia_full/Inputs/Hydrobia_SF71_amb_1_C3/", x))
+  mask <- readImage(paste0("../Datasets/Hydrobia_full/Inputs/Hydrobia_SF49_three_0_B4/", x))
   # mask <- mask*correctionMatrix
   
   
@@ -48,12 +39,8 @@ convert_batch <- function(x){
   
   set.seed(seed = 1)
   # Write processed images
-  writeJPEG(mask, target = paste0("../Datasets/Hydrobia_full/Outputs/Processed/Hydrobia_SF71_amb_1_C3_superpix_processed/", 
+  writeJPEG(mask, target = paste0("../Datasets/Hydrobia_full/Outputs/Processed/Hydrobia_SF49_three_0_B4_superpix_processed/", 
                                   strsplit(x, ".", fixed=T)[[1]][[1]], ".tif"), quality = 1)
-  
-  #####
-  # Stage 2 : Segmentation
-  #####
   
   init = Image_Segmentation$new()
   
@@ -75,26 +62,29 @@ convert_batch <- function(x){
                                  adjust_centroids_and_return_masks = TRUE,
                                  verbose = TRUE)
   
+  # In some image profiles (high background illumination), it is helpful to lower sim_color_radius or reduce number of superpixels  
+  # It is optional to subselect clusters to refine  segments as features are composites of clusters
+  # If the background is not properly delimited by the segmentation algorithm:
+  
+  # This option is here (choose clusters to define as zero)
+  #clusters[clusters %in% c(1,2)] = 0
+  #clusters[clusters != 0] = 1
+  
   clusters = spx$spix_labels
-  
-  # This is the key: Correctly choosing which clusters contain segments 
-  # If only 2 clusters are defined by spixel_segmentation, usually 1 is background (set to 0) and 2 is segments
-  # When >2 are defined (Try to reduce with high value of sim_color_radius), then this needs to be checked carefully and multiple clusters should be set to background, 
-  # sometimes features are composites of clusters. They are beautifully captured when this is the case.
-  
-  #clusters[clusters %in% 1:2] = 0
-  clusters[clusters %in% c(1,2,3)] = 0
-  
-  # and the remaining segments to 1
-  clusters[clusters != 0] = 1
-  
   img_segs <- EBImage::Image(clusters)
   
+  # Edge-based (edge detection)
+  #final <- fillHull(bwlabel(EBImage::Image(edge_detection(clusters, method = "Frei_chen"))))
+  
+  # Threshold-based (binary)
+  #final = fillHull(bwlabel(distmap(img_segs)))
+  
+  # Region-based (watershed)
   final = fillHull(watershed(distmap(img_segs), ext = 1, tolerance = 1000))
   
   plot(colorLabels(final))
   
-  writeJPEG(colorLabels(final), target = paste0("../Datasets/Hydrobia_full/Outputs/Segments/Hydrobia_SF71_amb_1_C3_superpix_segments/", 
+  writeJPEG(colorLabels(final), target = paste0("../Datasets/Hydrobia_full/Outputs/Segments/Hydrobia_SF49_three_0_B4_superpix_segments/", 
                                                 strsplit(x, ".", fixed=T)[[1]][[1]], ".tif"), quality = 1)
   
   #####
@@ -107,15 +97,15 @@ convert_batch <- function(x){
               mutate(across(all_of(names(as.data.frame(computeFeatures.shape(final)))), ~ .x /83)) %>%
               mutate(pixels.size = (s.radius.max*2)*83) %>% 
               mutate(size..mm. = s.radius.max*2) %>% 
-              filter(size..mm. < 8) %>% 
-              filter(size..mm. > 0.5) %>% 
+              filter(size..mm. < 7.5) %>% 
+              filter(size..mm. > 0.9) %>% 
               mutate(Sample = paste0(x)), 
-            paste0("../Datasets/Hydrobia_full/Outputs/Features/Hydrobia_SF71_amb_1_C3_superpix_segment_features/", x, ".csv"))
+            paste0("../Datasets/Hydrobia_full/Outputs/Features/Hydrobia_SF49_three_0_B4_superpix_segment_features/", x, ".csv"))
   
 }
 
 
-sapply(dir("../Datasets/Hydrobia_full/Inputs/Hydrobia_SF71_amb_1_C3/"), convert_batch)
+sapply(dir("../Datasets/Hydrobia_full/Inputs/Hydrobia_SF49_three_0_B4/"), Segmentation)
 
 # profvis() function to retrieve memory stats
 
@@ -124,7 +114,7 @@ sapply(dir("../Datasets/Hydrobia_full/Inputs/Hydrobia_SF71_amb_1_C3/"), convert_
 ## A * note is present for each unique directory 
 
 # *
-wd_in <- "../Datasets/Hydrobia_full/Inputs/Hydrobia_SF71_amb_1_C3/Hydrobia_SF71_amb_1_C3_16.tif"
+wd_in <- "../Datasets/Hydrobia_full/Inputs/Hydrobia_SF49_three_0_B4/Hydrobia_SF49_three_0_B4_8.tif"
 img <- EBImage::readImage(wd_in)
 
 # Ensure same seetings as batch, otherwise make note
@@ -156,7 +146,7 @@ spx = init$spixel_segmentation(input_image = img_grey_norm,
 clusters = spx$spix_labels
 
 # set these to background (or to the value of 0)
-clusters[clusters %in% c(1,2)] = 0
+clusters[clusters %in% c(1,3,6)] = 0
 
 # and the remaining segments to 1 to delimit ROIs
 clusters[clusters != 0] = 1
@@ -171,7 +161,7 @@ plot(colorLabels(final))
 # Write corrected segments to folder 
 # *
 writeJPEG(colorLabels(final), 
-          target = paste0("../Datasets/Hydrobia_full/Outputs/Segments/Hydrobia_SF71_amb_1_C3_superpix_segments/Hydrobia_SF71_amb_1_C3_16.tif"),
+          target = paste0("../Datasets/Hydrobia_full/Outputs/Segments/Hydrobia_SF49_three_0_B4_superpix_segments/Hydrobia_SF49_three_0_B4_8.tif"),
           quality = 1)
 
 # Write features
@@ -182,7 +172,23 @@ write.csv(as.data.frame(computeFeatures.shape(final)) %>%
             filter(size..mm. < 7.5) %>% 
             filter(size..mm. > 0.9) %>% 
             # *
-            mutate(Sample = paste0("Hydrobia_SF71_amb_1_C3_16.tif")), 
+            mutate(Sample = paste0("Hydrobia_SF49_three_0_B4_8.tif")), 
           # *
-          paste0("../Datasets/Hydrobia_full/Outputs/Features/Hydrobia_SF71_amb_1_C3_superpix_segment_features/Hydrobia_SF71_amb_1_C3_16.tif.csv"))
+          paste0("../Datasets/Hydrobia_full/Outputs/Features/Hydrobia_SF49_three_0_B4_superpix_segment_features/Hydrobia_SF49_three_0_B4_8.tif.csv"))
 
+######
+###### Sandbox
+###### 
+clusters <- if_else(clusters[clusters] > 2 ,  
+                    matrix(clusters[clusters %in% 1] <- 0), 
+                    matrix(clusters[clusters %in% 1:2] <- 0))
+
+if (clusters[clusters] < 3) {
+  (clusters[clusters %in% 1] = 0 & clusters[clusters != 0] = 1) 
+} else if (clusters[clusters] > 2) {
+  clusters[clusters %in% 1:2] = 0 & clusters[clusters != 0] = 1
+}
+
+######
+###### 
+######  
