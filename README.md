@@ -30,4 +30,4 @@ MacNeil, Liam; Joly, Léa J; Ito, Maysa; Steinmann, Anna; Mehler, Knut; Scotti, 
 
 See the [PANGAEA database](https://doi.pangaea.de/10.1594/PANGAEA.957929) for all raw input images, processed images, and output segments.
 
-MacNeil, Liam; Joly, Léa J; Ito, Maysa; Steinmann, Anna; Drakula, Maja; Wiegand, Hannes; Morsbach, Samuel; Karnatz, Josefine; Scotti, Marco (2023): Hydrobiid mudsnail image dataset from a mesocosm experiment with multiple temperature treatments. PANGAEA, https://doi.org/10.1594/PANGAEA.957929
+MacNeil, Liam; Joly, Léa J; Ito, Maysa; Steinmann, Anna; Drakula, Maja; Wiegand, Hannes; Morsbach, Samuel; Karnatz, Josefine; Scotti, Marco (2024): Hydrobiid mudsnail image dataset: Raw stereomicroscope, processed, and segmented images of abundant brackish snails from a mesocosm experiment with multiple temperature treatments. PANGAEA, https://doi.org/10.1594/PANGAEA.957929
