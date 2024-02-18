@@ -26,7 +26,7 @@ This is an accompanying respository (R script and raw data files) for our [paper
 
 <b>Reference:</b>
 
-MacNeil, Liam; Joly, Léa J; Ito, Maysa; Steinmann, Anna; Mehler, Knut; Scotti, Marco (2023): Rapid segmentation and sizing of an abundant mudsnail: Applying superpixels to scale accurate detection of growth response to ocean warming. <i>Methods in Ecology and Evolution</i>.
+MacNeil, L., Joly, L. J., Ito, M., Steinmann, A., Mehler, K., & Scotti, M. (2024). Sizing mudsnails: Applying superpixels to scale growth detection under ocean warming. <i>Methods in Ecology and Evolution</i>., 2041-210X.14295. https://doi.org/10.1111/2041-210X.14295
 
 See the [PANGAEA database](https://doi.pangaea.de/10.1594/PANGAEA.957929) for all raw input images, processed images, output segments, and metadata.
 
